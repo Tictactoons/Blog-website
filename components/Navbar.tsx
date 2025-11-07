@@ -90,13 +90,15 @@ export default function Navbar() {
             Newsletter
           </Link>
 
-         
-          <Link
-            href="/write"
-            className="hover:text-[#6941C6] dark:text-white dark:hover:text-blue-400 transition-colors"
-          >
-            Write
-          </Link>
+          {/* ✅ Write link only for logged-in users */}
+          {user && (
+            <Link
+              href="/write"
+              className="hover:text-[#6941C6] dark:text-white dark:hover:text-blue-400 transition-colors"
+            >
+              Write
+            </Link>
+          )}
 
           {/* Dark mode toggle */}
           <button
@@ -116,8 +118,7 @@ export default function Navbar() {
             </span>
           </button>
 
-
-           {/* Dynamic Login / Logout */}
+          {/* Dynamic Login / Logout */}
           {user ? (
             <button
               onClick={handleLogout}
@@ -137,7 +138,6 @@ export default function Navbar() {
               Login
             </Link>
           )}
-
         </div>
 
         {/* Mobile menu button */}
@@ -191,12 +191,15 @@ export default function Navbar() {
             Newsletter
           </Link>
 
-          <Link
-            href="/dashboard"
-            className="hover:text-[#6941C6] dark:text-white dark:hover:text-blue-400 transition-colors"
-          >
-            Dash
-          </Link>
+            {/* ✅ Write link only for logged-in users */}
+  {user && (
+    <Link
+      href="/write"
+      className="hover:text-[#6941C6] dark:text-white dark:hover:text-blue-400 transition-colors"
+    >
+      Write
+    </Link>
+  )}
 
           <button
             onClick={() => setDarkMode(!darkMode)}

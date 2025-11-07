@@ -28,8 +28,8 @@ export default function SignupPage() {
   };
 
   return (
-    <div className="max-w-md mx-auto mt-20 p-6 bg-white dark:bg-gray-900 shadow-md rounded-lg">
-      <h1 className="text-2xl font-bold mb-4">Sign Up</h1>
+    <div className="max-w-xs md:max-w-sm lg:max-w-md 2xl:max-w-lg mx-auto my-20 p-6 py-16 bg-white dark:bg-gray-900 shadow-md rounded-lg">
+      <h1 className="font-bold text-2xl md:text-[22px] text-[#1a1a1a] dark:text-white mb-5">Sign Up</h1>
       {error && <p className="text-red-500 mb-2">{error}</p>}
       {message && <p className="text-green-500 mb-2">{message}</p>}
       <form onSubmit={handleSignup} className="flex flex-col gap-3">
@@ -49,7 +49,7 @@ export default function SignupPage() {
           className="p-2 border rounded"
           required
         />
-        <button className="bg-green-600 text-white py-2 rounded hover:bg-green-700 transition">
+        <button className="bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition">
           Sign Up
         </button>
       </form>

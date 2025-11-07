@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
-import { useSession } from "next-auth/react";
+import { useState, useEffect } from "react";
+import { supabase } from "@/lib/supabaseClient";
+import { useRouter } from "next/navigation";
 import { EditorContent, useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import ImageExtension from "@tiptap/extension-image";
@@ -13,10 +14,28 @@ const categories = [
   "Marketing",
   "Freelancing",
   "No-code",
+  "Mobile Development",
+  "Frontend Development",
+  "Backend Development",
+  "Fullstack Development",
+  "Data Science",
+  "Machine Learning",
+  "Blockchain",
+  "Cybersecurity",
+  "Cloud Computing",
+  "Software Engineering",
+  "Game Development",
+  "Programming Languages",
+  "Productivity Tools",
+  "Digital Transformation",
+  "Tech Reviews"
 ];
 
 export default function WritePage() {
-  const { data: session } = useSession();
+  const [user, setUser] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  const router = useRouter();
+
   const [title, setTitle] = useState("");
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [file, setFile] = useState<File | null>(null);
@@ -25,8 +44,24 @@ export default function WritePage() {
   const editor = useEditor({
     extensions: [StarterKit, ImageExtension],
     content: "",
-    immediatelyRender: false, // ✅ Important fix for SSR mismatch
+    immediatelyRender: false,
   });
+
+  // Check user session on mount
+  useEffect(() => {
+    const checkUser = async () => {
+      const { data } = await supabase.auth.getSession();
+      if (!data.session?.user) {
+        router.push("/login"); // redirect if not logged in
+      } else {
+        setUser(data.session.user);
+      }
+      setLoading(false);
+    };
+    checkUser();
+  }, [router]);
+
+  if (loading) return <p className="text-center mt-10">Loading...</p>;
 
   const handleCategoryToggle = (cat: string) => {
     if (selectedCategories.includes(cat)) {
@@ -66,7 +101,7 @@ export default function WritePage() {
       title,
       content: editor.getHTML(),
       categories: selectedCategories,
-      writer: session?.user?.name || "Anonymous",
+      writer: user?.email || "Anonymous",
       image: imageUrl,
     };
 
@@ -86,7 +121,9 @@ export default function WritePage() {
 
   return (
     <div className="max-w-4xl mx-auto py-10 px-5">
-      <h1 className="text-3xl font-bold mb-5">Write a Post</h1>
+      <h1 className="text-3xl font-bold mb-5 md:text-[22px] dark:text-white text-[#1a1a1a]">
+        Write a Post
+      </h1>
 
       {/* Title */}
       <input
@@ -98,14 +135,14 @@ export default function WritePage() {
       />
 
       {/* Category Selector */}
-      <div className="mb-4 flex flex-wrap gap-2">
+      <div className="mb-4 flex flex-wrap gap-3">
         {categories.map((cat) => (
           <button
             key={cat}
             onClick={() => handleCategoryToggle(cat)}
             className={`px-3 py-1 rounded-full text-sm font-medium ${
               selectedCategories.includes(cat)
-                ? "bg-blue-600 text-white"
+                ? "bg-[#090D1F] dark:bg-blue-700 text-white"
                 : "bg-gray-200 dark:bg-gray-700 dark:text-white"
             }`}
           >
@@ -115,7 +152,7 @@ export default function WritePage() {
       </div>
 
       {/* Image Upload */}
-      <div className="mb-4">
+      <div className="my-6">
         <input
           type="file"
           accept="image/*"
@@ -129,14 +166,14 @@ export default function WritePage() {
       {/* Editor */}
       <EditorContent
         editor={editor}
-        className="border p-4 rounded min-h-[300px] mb-4 bg-white dark:bg-gray-800"
+        className="border p-4 rounded mb-4 bg-white dark:bg-gray-800 min-h-[300px] h-auto break-words whitespace-pre-wrap"
       />
 
       {/* Publish Button */}
       <button
         onClick={handlePublish}
         disabled={uploading}
-        className="bg-blue-600 text-white px-5 py-2 rounded hover:bg-blue-700 transition-colors"
+        className="dark:bg-blue-600 bg-[#090D1F] text-white px-5 py-2 rounded hover:bg-blue-700 transition-colors"
       >
         {uploading ? "Publishing..." : "Publish"}
       </button>
