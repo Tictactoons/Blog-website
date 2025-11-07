@@ -1,45 +1,59 @@
-// app/projects/page.tsx
-import ProjectCard from "@/components/ProjectCard";
-import { projects } from "@/lib/project";
-import Link from "next/link";
 
-export default function ProjectsPage() {
-  const perPage = 8;
-  const displayedProjects = projects.slice(0, perPage); // you can later paginate this dynamically
+
+"use client";
+import { useState } from "react";
+import ProjectCard from "@/components/ProjectCard";
+import {projects} from "@/lib/project";
+import Pagination from "@/components/Pagination";
+
+type Props = {
+  showPagination?: boolean; 
+};
+
+export default function ProjectsPage({showPagination = true}: Props) {
+  const [currentPage, setCurrentPage] = useState(1);
+  const projectsPerPage = 8;
+
+  const startIndex = (currentPage - 1) * projectsPerPage;
+  const endIndex = startIndex + projectsPerPage;
+  const currentProjects = projects.slice(startIndex, endIndex);
+
+  const totalPages = Math.ceil(projects.length / projectsPerPage);
 
   return (
-    <section className="max-w-6xl mx-auto px-4 py-16">
-      <h1 className="text-3xl font-bold text-gray-900 mb-10">Projects</h1>
+    <section className="py-12 max-w-7xl mx-auto px-5 sm:px-10 pt-16">
+      <div className="w-full max-w-7xl h-[2px] bg-[#d4d8e0]"></div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-        {displayedProjects.map((project, index) => (
+        <div className="pt-6 pb-6 text-center">
+        <b className="text-[#1A1A1A] dark:text-white md:font-bold text-5xl font-extrabold md:text-8xl 2xl:text-[150px]">
+            PROJECTS
+        </b>
+    </div>
+
+    <div className="w-full max-w-7xl h-[2px] bg-[#d4d8e0]"></div>
+
+      <h1 className="mt-12 mb-4 font-semibold text-xl md:text-[22px] dark:text-white text-[#1a1a1a]">List Projects</h1>
+
+      {/* 🧱 Project Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        {currentProjects.map((project, index) => (
           <div
             key={project.id}
-            className={`
-              ${index === 2 ? "md:col-span-2" : ""} 
-              ${index > 2 && (index - 3) % 3 === 2 ? "md:col-span-2" : ""}
-            `}
+            className={`${
+              currentPage === 1 && index === 3 ? "lg:col-span-2" : ""
+            }`}
           >
             <ProjectCard project={project} />
           </div>
         ))}
       </div>
 
-      {/* Pagination */}
-      <div className="mt-12 flex justify-center">
-        <Link
-          href="#"
-          className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-100"
-        >
-          Previous
-        </Link>
-        <Link
-          href="#"
-          className="px-4 py-2 border border-gray-300 rounded-lg ml-3 text-gray-700 hover:bg-gray-100"
-        >
-          Next
-        </Link>
-      </div>
+      {/* 📄 Pagination */}
+      {showPagination && <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={(page) => setCurrentPage(page)}
+            />}
     </section>
   );
 }

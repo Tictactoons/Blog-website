@@ -1,7 +1,5 @@
 import AllBlogPost from "@/components/AllBlogPost";
-import Footer from "@/components/Footer";
 import Hero from "@/components/Hero";
-import Navbar from "@/components/Navbar";
 import RecentPosts from "@/components/RecentPost";
 import posts from "@/lib/Blogpost";
 
