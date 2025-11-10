@@ -1,7 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { supabase } from "@/lib/supabaseClient";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { EditorContent, useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
@@ -32,10 +31,7 @@ const categories = [
 ];
 
 export default function WritePage() {
-  const [user, setUser] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
   const router = useRouter();
-
   const [title, setTitle] = useState("");
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [file, setFile] = useState<File | null>(null);
@@ -46,22 +42,6 @@ export default function WritePage() {
     content: "",
     immediatelyRender: false,
   });
-
-  // Check user session on mount
-  useEffect(() => {
-    const checkUser = async () => {
-      const { data } = await supabase.auth.getSession();
-      if (!data.session?.user) {
-        router.push("/login"); // redirect if not logged in
-      } else {
-        setUser(data.session.user);
-      }
-      setLoading(false);
-    };
-    checkUser();
-  }, [router]);
-
-  if (loading) return <p className="text-center mt-10">Loading...</p>;
 
   const handleCategoryToggle = (cat: string) => {
     if (selectedCategories.includes(cat)) {
@@ -78,12 +58,8 @@ export default function WritePage() {
 
     const res = await fetch(
       `https://api.cloudinary.com/v1_1/YOUR_CLOUDINARY_CLOUD_NAME/image/upload`,
-      {
-        method: "POST",
-        body: formData,
-      }
+      { method: "POST", body: formData }
     );
-
     const data = await res.json();
     return data.secure_url;
   };
@@ -93,16 +69,14 @@ export default function WritePage() {
     setUploading(true);
 
     let imageUrl = null;
-    if (file) {
-      imageUrl = await uploadImage(file);
-    }
+    if (file) imageUrl = await uploadImage(file);
 
     const postData = {
       title,
       content: editor.getHTML(),
-      categories: selectedCategories,
-      writer: user?.email || "Anonymous",
+      categories: selectedCategories.join(","), // comma-separated
       image: imageUrl,
+      status: "PUBLISHED", // optional drafts support later
     };
 
     await fetch("/api/posts", {
@@ -117,13 +91,12 @@ export default function WritePage() {
     editor.commands.setContent("");
     setSelectedCategories([]);
     setFile(null);
+    router.push("/blog"); // redirect to blog listing
   };
 
   return (
     <div className="max-w-4xl mx-auto py-10 px-5">
-      <h1 className="text-3xl font-bold mb-5 md:text-[22px] dark:text-white text-[#1a1a1a]">
-        Write a Post
-      </h1>
+      <h1 className="text-3xl font-bold mb-5">Write a Post</h1>
 
       {/* Title */}
       <input
@@ -142,7 +115,7 @@ export default function WritePage() {
             onClick={() => handleCategoryToggle(cat)}
             className={`px-3 py-1 rounded-full text-sm font-medium ${
               selectedCategories.includes(cat)
-                ? "bg-[#090D1F] dark:bg-blue-700 text-white"
+                ? "bg-[#090D1F] text-white"
                 : "bg-gray-200 dark:bg-gray-700 dark:text-white"
             }`}
           >
@@ -156,9 +129,7 @@ export default function WritePage() {
         <input
           type="file"
           accept="image/*"
-          onChange={(e) => {
-            if (e.target.files) setFile(e.target.files[0]);
-          }}
+          onChange={(e) => e.target.files && setFile(e.target.files[0])}
         />
         {file && <p className="mt-2">Selected file: {file.name}</p>}
       </div>
@@ -166,14 +137,14 @@ export default function WritePage() {
       {/* Editor */}
       <EditorContent
         editor={editor}
-        className="border p-4 rounded mb-4 bg-white dark:bg-gray-800 min-h-[300px] h-auto break-words whitespace-pre-wrap"
+        className="border p-4 rounded mb-4 bg-white dark:bg-gray-800 min-h-[300px]"
       />
 
       {/* Publish Button */}
       <button
         onClick={handlePublish}
         disabled={uploading}
-        className="dark:bg-blue-600 bg-[#090D1F] text-white px-5 py-2 rounded hover:bg-blue-700 transition-colors"
+        className="bg-[#090D1F] text-white px-5 py-2 rounded hover:bg-blue-700 transition-colors"
       >
         {uploading ? "Publishing..." : "Publish"}
       </button>

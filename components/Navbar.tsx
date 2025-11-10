@@ -5,12 +5,14 @@ import { IoMdClose } from "react-icons/io";
 import { Menu, X } from "lucide-react";
 import { supabase } from "@/lib/supabaseClient";
 import { useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const [darkMode, setDarkMode] = useState(false);
   const [user, setUser] = useState<any>(null);
   const router = useRouter();
+  const pathname = usePathname();
 
   useEffect(() => {
     if (darkMode) {
@@ -67,25 +69,33 @@ export default function Navbar() {
         <div className="hidden md:flex text-xs items-center gap-6 font-semibold">
           <Link
             href="/blog"
-            className="hover:text-[#6941C6] dark:text-white dark:hover:text-blue-400 transition-colors"
+            className={`hover:text-[#6941C6] dark:text-white dark:hover:text-blue-400 transition-colors ${
+              pathname === "/blog" ? "text-[#6941C6] font-bold border-b-2 border-[#6941C6]" : "border-b-2 border-transparent"
+            }`}
           >
             Blog
           </Link>
           <Link
             href="/projects"
-            className="hover:text-[#6941C6] dark:text-white dark:hover:text-blue-400 transition-colors"
+            className={`hover:text-[#6941C6] dark:text-white dark:hover:text-blue-400 transition-colors ${
+              pathname === "/projects" ? "text-[#6941C6] font-bold border-b-2 border-[#6941C6]" : "border-b-2 border-transparent"
+            }`}
           >
             Projects
           </Link>
           <Link
             href="/about"
-            className="hover:text-[#6941C6] dark:text-white dark:hover:text-blue-400 transition-colors"
+            className={`hover:text-[#6941C6] dark:text-white dark:hover:text-blue-400 transition-colors ${
+              pathname === "/about" ? "text-[#6941C6] font-bold border-b-2 border-[#6941C6]" : "border-b-2 border-transparent"
+            }`}
           >
             About
           </Link>
           <Link
             href="/newsletter"
-            className="hover:text-[#6941C6] dark:text-white dark:hover:text-blue-400 transition-colors"
+            className={`hover:text-[#6941C6] dark:text-white dark:hover:text-blue-400 transition-colors ${
+              pathname === "/newsletter" ? "text-[#6941C6] font-bold border-b-2 border-[#6941C6]" : "border-b-2 border-transparent"
+            }`}
           >
             Newsletter
           </Link>
@@ -94,7 +104,9 @@ export default function Navbar() {
           {user && (
             <Link
               href="/write"
-              className="hover:text-[#6941C6] dark:text-white dark:hover:text-blue-400 transition-colors"
+              className={`hover:text-[#6941C6] dark:text-white dark:hover:text-blue-400 transition-colors ${
+              pathname === "/write" ? "text-[#6941C6] font-bold border-b-2 border-[#6941C6]" : "border-b-2 border-transparent"
+            }`}
             >
               Write
             </Link>
@@ -161,6 +173,7 @@ export default function Navbar() {
         <div className="md:hidden fixed inset-0 h-screen bg-white dark:bg-gray-900 px-5 pb-4 space-y-6 flex flex-col items-center justify-center">
           <Link
             href="/"
+            onClick={() => setIsOpen(false)}
             className="text-xl tracking-[-0.05em] font-bold text-gray-900 dark:text-white"
           >
             isaiah.dev
@@ -168,38 +181,53 @@ export default function Navbar() {
 
           <Link
             href="/blog"
-            className="block hover:text-blue-600 dark:text-white dark:hover:text-blue-400"
+            onClick={() => setIsOpen(false)}
+            className={`block hover:text-blue-600 dark:text-white dark:hover:text-blue-400 ${
+    pathname === "/blog" ? "text-blue-600 font-bold" : ""
+  }`}
           >
             Blog
           </Link>
           <Link
             href="/projects"
-            className="block hover:text-blue-600 dark:text-white dark:hover:text-blue-400"
+            onClick={() => setIsOpen(false)}
+            className={`block hover:text-blue-600 dark:text-white dark:hover:text-blue-400 ${
+    pathname === "/projects" ? "text-blue-600 font-bold" : ""
+  }`}
           >
             Projects
           </Link>
           <Link
             href="/about"
-            className="block hover:text-blue-600 dark:text-white dark:hover:text-blue-400"
+            onClick={() => setIsOpen(false)}
+            className={`block hover:text-blue-600 dark:text-white dark:hover:text-blue-400 ${
+    pathname === "/about" ? "text-blue-600 font-bold" : ""
+  }`}
           >
             About
           </Link>
           <Link
             href="/newsletter"
-            className="block hover:text-blue-600 dark:text-white dark:hover:text-blue-400"
+            onClick={() => setIsOpen(false)}
+            className={`block hover:text-blue-600 dark:text-white dark:hover:text-blue-400 ${
+    pathname === "/newsletter" ? "text-blue-600 font-bold" : ""
+  }`}
           >
             Newsletter
           </Link>
 
-            {/* ✅ Write link only for logged-in users */}
-  {user && (
-    <Link
-      href="/write"
-      className="hover:text-[#6941C6] dark:text-white dark:hover:text-blue-400 transition-colors"
-    >
-      Write
-    </Link>
-  )}
+          {/* ✅ Write link only for logged-in users */}
+          {user && (
+            <Link
+              href="/write"
+              onClick={() => setIsOpen(false)}
+              className={`block hover:text-blue-600 dark:text-white dark:hover:text-blue-400 ${
+    pathname === "/write" ? "text-blue-600 font-bold" : ""
+  }`}
+            >
+              Write
+            </Link>
+          )}
 
           <button
             onClick={() => setDarkMode(!darkMode)}
@@ -220,7 +248,10 @@ export default function Navbar() {
 
           {user ? (
             <button
-              onClick={handleLogout}
+              onClick={ async () => {
+                await handleLogout();
+                setIsOpen(false);
+              }}
               className="hover:text-[#ddd8e8] text-white dark:hover:text-[#090D1F] 
               transition-colors px-3 text-xs py-2 rounded-xl dark:hover:bg-[#a8b3dd] bg-[#090D1F] font-semibold
                dark:bg-white dark:text-[#090D1F] hover:bg-[#090D1F]/90"
